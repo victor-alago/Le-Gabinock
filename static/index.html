@@ -1,0 +1,1515 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Réservation de salles - Le GabinOck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg:#F4F6FE;
+  --surface:#fff;
+  --ink:#0F1B4D;
+  --muted:#5B6488;
+  --line:#E0E5F5;
+  --blue:#2445F0;
+  --free:#DFF5E6;
+  --free-ink:#0F6B3A;
+  --free-line:#8FD4A8;
+  --freebar:#4CC57F;
+  --orange:#FF7A1A;
+  --orange-ink:#B84A00;
+  --orange-soft:#FFEBDA;
+  --danger:#E5470B;
+  --r:14px;
+  --hatch:repeating-linear-gradient(135deg,#ECEFF3 0 6px,#DFE3EA 6px 12px);
+}
+
+* {
+  box-sizing:border-box;
+}
+
+body {
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:Manrope,system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:15px;
+  line-height:1.5;
+}
+
+button,input {
+  font:inherit;
+}
+
+button {
+  color:inherit;
+}
+
+:focus-visible {
+  outline:2px solid var(--blue);
+  outline-offset:2px;
+}
+
+[hidden] {
+  display:none !important;
+}
+
+.wrap {
+  max-width:960px;
+  margin:0 auto;
+  padding:0 20px;
+}
+
+.top {
+  position:sticky;
+  top:0;
+  z-index:20;
+  background:rgba(255,255,255,.96);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);
+}
+
+.top .wrap {
+  display:flex;
+  align-items:center;
+  gap:16px;
+  flex-wrap:wrap;
+  padding-top:10px;
+  padding-bottom:10px;
+}
+
+.brand {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight:800;
+  font-size:18px;
+  letter-spacing:-.01em;
+  margin-right:auto;
+  white-space:nowrap;
+}
+
+.tabs {
+  display:flex;
+  gap:4px;
+  background:#ECEFFC;
+  padding:4px;
+  border-radius:12px;
+}
+
+.tabs button {
+  border:0;
+  background:transparent;
+  color:var(--muted);
+  font-weight:600;
+  padding:8px 14px;
+  border-radius:9px;
+  cursor:pointer;
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+
+.tabs button[aria-selected="true"] {
+  background:#fff;
+  color:var(--ink);
+  box-shadow:0 1px 2px rgba(23,32,51,.14);
+}
+
+.badge {
+  background:var(--orange);
+  color:var(--ink);
+  font-weight:800;
+  border-radius:99px;
+  font-size:12px;
+  padding:0 7px;
+  min-width:20px;
+  text-align:center;
+  line-height:20px;
+}
+
+main {
+  padding:28px 0 90px;
+}
+
+h1 {
+  font-size:28px;
+  line-height:1.2;
+  letter-spacing:-.02em;
+  margin:0 0 4px;
+  font-weight:800;
+}
+
+h2 {
+  font-size:15px;
+  margin:26px 0 10px;
+  font-weight:700;
+  color:var(--muted);
+}
+
+h3 {
+  margin:0;
+  font-size:17px;
+  letter-spacing:-.01em;
+}
+
+.sub {
+  color:var(--muted);
+  margin:0 0 22px;
+  max-width:60ch;
+}
+
+.controls {
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  align-items:center;
+  margin-bottom:14px;
+}
+
+.daynav {
+  display:flex;
+  align-items:center;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:12px;
+}
+
+.daynav .icon {
+  width:42px;
+  height:42px;
+  border:0;
+  background:transparent;
+  font-size:22px;
+  cursor:pointer;
+  color:var(--ink);
+  border-radius:12px;
+}
+
+.daynav .icon:disabled {
+  opacity:.25;
+  cursor:not-allowed;
+}
+
+.date {
+  position:relative;
+  min-width:200px;
+  text-align:center;
+  line-height:1.2;
+  padding:4px 8px;
+  cursor:pointer;
+}
+
+.date span {
+  display:block;
+  font-weight:700;
+}
+
+.date small {
+  color:var(--blue);
+  font-weight:700;
+  font-size:12px;
+  display:block;
+  min-height:14px;
+}
+
+.date input {
+  position:absolute;
+  inset:0;
+  opacity:0;
+  cursor:pointer;
+  width:100%;
+}
+
+.chips {
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.chip {
+  border:1px solid var(--line);
+  background:#fff;
+  border-radius:99px;
+  padding:8px 14px;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.chip small {
+  color:var(--muted);
+  font-weight:500;
+  margin-left:6px;
+}
+
+.chip[aria-pressed="true"] {
+  background:var(--blue);
+  border-color:var(--blue);
+  color:#fff;
+}
+
+.chip[aria-pressed="true"] small {
+  color:#D5DEFF;
+}
+
+.chip:disabled {
+  opacity:.4;
+  cursor:not-allowed;
+}
+
+.count {
+  color:var(--muted);
+  margin:6px 0 14px;
+}
+
+.count b {
+  color:var(--ink);
+}
+
+.grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(290px,1fr));
+  gap:14px;
+}
+
+.room {
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:var(--r);
+  padding:16px;
+  cursor:pointer;
+}
+
+.room:hover {
+  border-color:#B8C4F5;
+  box-shadow:0 4px 16px rgba(36,69,240,.12);
+}
+
+.room.dim {
+  opacity:.62;
+}
+
+.meta {
+  display:flex;
+  gap:14px;
+  color:var(--muted);
+  font-size:13.5px;
+  margin:4px 0 0;
+}
+
+.meta span {
+  white-space:nowrap;
+  display:inline-flex;
+  gap:5px;
+  align-items:center;
+}
+
+.pill {
+  font-size:12px;
+  font-weight:700;
+  padding:3px 10px;
+  border-radius:99px;
+  white-space:nowrap;
+}
+
+.pill.ok {
+  background:var(--free);
+  color:var(--free-ink);
+}
+
+.pill.no {
+  background:#F3EEE9;
+  color:#7A6B5F;
+}
+
+.tags {
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:12px;
+}
+
+.tag {
+  font-size:12px;
+  font-weight:600;
+  background:#EEF1FF;
+  color:#34408A;
+  padding:3px 9px;
+  border-radius:7px;
+}
+
+.bar {
+  display:grid;
+  grid-template-columns:repeat(9,1fr);
+  gap:2px;
+  height:12px;
+  margin-top:14px;
+}
+
+.bar i {
+  border-radius:3px;
+  background:var(--freebar);
+}
+
+.bar i.b {
+  background:var(--hatch);
+}
+
+.bar i.in {
+  background:var(--orange);
+}
+
+.bar i.e {
+  background:#E4E9FA;
+}
+
+.bar i.out {
+  opacity:.3;
+}
+
+.ticks {
+  position:relative;
+  height:16px;
+  margin-top:3px;
+}
+
+.ticks span {
+  position:absolute;
+  font-size:11px;
+  color:var(--muted);
+}
+
+.go-link {
+  font-weight:700;
+  color:var(--free-ink);
+  font-size:14px;
+  white-space:nowrap;
+}
+
+.status {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+  margin-top:12px;
+}
+
+.empty {
+  background:#fff;
+  border:1px dashed #BCC8F7;
+  border-radius:var(--r);
+  padding:34px 20px;
+  text-align:center;
+  color:var(--muted);
+}
+
+.empty b {
+  display:block;
+  color:var(--ink);
+  font-size:17px;
+  margin-bottom:4px;
+}
+
+.btn {
+  border:0;
+  border-radius:10px;
+  background:var(--blue);
+  color:#fff;
+  font-weight:700;
+  padding:10px 18px;
+  cursor:pointer;
+}
+
+.btn.ghost {
+  background:#fff;
+  border:1px solid var(--line);
+  color:var(--ink);
+}
+
+.btn.danger {
+  background:var(--danger);
+}
+
+.btn.warm {
+  background:var(--orange);
+  color:var(--ink);
+}
+
+.btn.sm {
+  padding:7px 12px;
+  font-size:14px;
+}
+
+.btn:disabled {
+  opacity:.35;
+  cursor:not-allowed;
+}
+
+.back {
+  border:0;
+  background:none;
+  color:var(--muted);
+  font-weight:600;
+  cursor:pointer;
+  padding:0;
+  margin-bottom:14px;
+}
+
+.back:hover {
+  color:var(--ink);
+}
+
+.head {
+  display:flex;
+  justify-content:space-between;
+  gap:16px;
+  flex-wrap:wrap;
+  align-items:flex-end;
+  margin-bottom:16px;
+}
+
+.panel {
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:var(--r);
+  padding:20px;
+  margin-top:14px;
+}
+
+.panel h2 {
+  margin:0 0 12px;
+}
+
+.timeline {
+  display:grid;
+  grid-template-columns:repeat(9,1fr);
+  gap:4px;
+}
+
+.cell {
+  border:1.5px solid transparent;
+  border-radius:10px;
+  min-height:78px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  align-items:flex-start;
+  padding:8px;
+  cursor:pointer;
+  text-align:left;
+}
+
+.cell b {
+  font-size:15px;
+}
+
+.cell span {
+  font-size:10.5px;
+  font-weight:700;
+}
+
+.cell.free {
+  background:var(--free);
+  color:var(--free-ink);
+  border-color:var(--free-line);
+}
+
+.cell.free:hover {
+  border-color:var(--free-ink);
+}
+
+.cell.busy {
+  background:var(--hatch);
+  color:#A59A90;
+  cursor:not-allowed;
+}
+
+.cell.reach {
+  background:var(--orange-soft);
+  border:1.5px dashed var(--orange);
+  color:var(--orange-ink);
+}
+
+.cell.sel {
+  background:var(--orange);
+  border-color:var(--orange);
+  color:var(--ink);
+}
+
+.legend {
+  display:flex;
+  gap:16px;
+  flex-wrap:wrap;
+  margin-top:12px;
+  font-size:13px;
+  color:var(--muted);
+}
+
+.legend i {
+  display:inline-block;
+  width:12px;
+  height:12px;
+  border-radius:3px;
+  margin-right:6px;
+  vertical-align:-1px;
+}
+
+.shortcuts {
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.dock {
+  position:sticky;
+  bottom:16px;
+  margin-top:18px;
+  background:var(--ink);
+  color:#fff;
+  border-radius:16px;
+  padding:14px 16px 14px 20px;
+  display:flex;
+  align-items:center;
+  gap:16px;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  box-shadow:0 12px 32px rgba(23,32,51,.28);
+}
+
+.dock .big {
+  font-size:22px;
+  font-weight:800;
+  letter-spacing:-.01em;
+}
+
+.dock .big.idle {
+  color:#8F9BD6;
+}
+
+.dock .small {
+  color:#B7C2F0;
+  font-size:13.5px;
+}
+
+.dock .btn {
+  background:var(--orange);
+  color:var(--ink);
+  padding:12px 20px;
+}
+
+.resa {
+  display:flex;
+  gap:16px;
+  align-items:center;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:var(--r);
+  padding:14px 16px;
+  margin-bottom:10px;
+}
+
+.resa.past {
+  opacity:.6;
+}
+
+.datebox {
+  width:56px;
+  flex:none;
+  text-align:center;
+  background:var(--orange-soft);
+  border-radius:12px;
+  padding:6px 0;
+  line-height:1.1;
+}
+
+.datebox b {
+  display:block;
+  font-size:22px;
+  color:var(--orange-ink);
+}
+
+.datebox span {
+  font-size:12px;
+  color:var(--muted);
+  font-weight:600;
+}
+
+.resa-main {
+  flex:1;
+  min-width:0;
+}
+
+.resa-main p {
+  margin:2px 0 0;
+  color:var(--muted);
+  font-size:14px;
+}
+
+.resa-main .bar {
+  height:8px;
+  margin-top:10px;
+  max-width:260px;
+}
+
+.when {
+  font-size:12px;
+  font-weight:700;
+  color:var(--orange-ink);
+  margin-left:8px;
+}
+
+.actions {
+  display:flex;
+  gap:8px;
+  flex:none;
+}
+
+.toast {
+  position:fixed;
+  left:50%;
+  bottom:24px;
+  transform:translate(-50%,20px);
+  background:var(--ink);
+  color:#fff;
+  padding:12px 18px;
+  border-radius:12px;
+  font-weight:600;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .2s,transform .2s;
+  z-index:50;
+  max-width:92vw;
+  box-shadow:0 10px 30px rgba(23,32,51,.3);
+}
+
+.toast.show {
+  opacity:1;
+  transform:translate(-50%,0);
+}
+
+.toast.err {
+  background:var(--danger);
+}
+
+/* Page de connexion : dimensions et alignement corrigés */
+.auth {
+  width:100%;
+  max-width:478px;
+  margin:7vh auto;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:28px;
+  box-shadow:0 12px 32px rgba(23,32,51,.08);
+}
+
+.auth form {
+  display:block;
+  width:100%;
+  min-width:0;
+  margin:0;
+}
+
+.auth label {
+  display:block;
+  font-weight:700;
+  margin:16px 0 6px;
+}
+
+.auth input {
+  display:block;
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  height:50px;
+  padding:12px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  font:inherit;
+  background:#fff;
+  box-sizing:border-box;
+}
+
+.auth .btn {
+  display:block;
+  width:100%;
+  margin-top:20px;
+}
+
+.auth-error {
+  color:var(--danger);
+  font-weight:700;
+  margin-top:12px;
+}
+
+.userbox {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  color:var(--muted);
+  font-size:13px;
+}
+
+/* Pendant la connexion, seul le logo et le nom restent visibles. */
+body.auth-mode .top .wrap {
+  justify-content:flex-start;
+}
+
+body.auth-mode .brand {
+  margin-right:0;
+}
+
+body.auth-mode .userbox,
+body.auth-mode .tabs {
+  display:none !important;
+}
+
+@media(max-width:560px) {
+  h1 {
+    font-size:24px;
+  }
+
+  .cell {
+    min-height:70px;
+    padding:6px;
+  }
+
+  .cell span {
+    display:none;
+  }
+
+  .resa {
+    flex-wrap:wrap;
+  }
+
+  .actions {
+    width:100%;
+  }
+
+  .date {
+    min-width:150px;
+  }
+
+  .top .wrap {
+    gap:10px;
+  }
+
+  .tabs {
+    width:100%;
+  }
+
+  .tabs button {
+    flex:1;
+    justify-content:center;
+  }
+
+  .auth {
+    margin:24px auto;
+    padding:20px;
+  }
+}
+
+@media(prefers-reduced-motion:reduce) {
+  * {
+    transition:none !important;
+  }
+}
+</style>
+</head>
+
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="brand">
+      <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true">
+        <rect width="28" height="28" rx="8" fill="#0F1B4D"/>
+        <rect x="6" y="7" width="10" height="3.5" rx="1.75" fill="#FF7A1A"/>
+        <rect x="6" y="12.25" width="16" height="3.5" rx="1.75" fill="#fff"/>
+        <rect x="6" y="17.5" width="7" height="3.5" rx="1.75" fill="#7C97FF"/>
+      </svg>
+      <span>Le GabinOck</span>
+    </div>
+
+    <div class="userbox" id="userbox" hidden>
+      <span id="useremail"></span>
+      <button class="btn ghost sm" id="logout" type="button">Déconnexion</button>
+    </div>
+
+    <nav class="tabs" id="navtabs" role="tablist" hidden>
+      <button type="button" role="tab" id="t-salles" onclick="vueSalles()">Salles</button>
+      <button type="button" role="tab" id="t-resas" onclick="vueResas()">
+        Mes réservations <span class="badge" id="badge" hidden></span>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap" id="app"></main>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const app = $('#app');
+
+const pad = n => String(n).padStart(2,'0');
+const iso = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const parse = s => {
+  const [y,m,d] = s.split('-').map(Number);
+  return new Date(y,m-1,d);
+};
+const today = iso(new Date());
+const add = (s,n) => {
+  const d = parse(s);
+  d.setDate(d.getDate()+n);
+  return iso(d);
+};
+const fmt = (s,o) => new Intl.DateTimeFormat('fr-FR',o).format(parse(s));
+const long = s => {
+  const t = fmt(s,{weekday:'long',day:'numeric',month:'long'});
+  return t[0].toUpperCase()+t.slice(1);
+};
+const rel = s => s===today ? 'Aujourd’hui' : s===add(today,1) ? 'Demain' : '';
+const esc = t => String(t).replace(/[&<>"]/g,c => ({
+  '&':'&amp;',
+  '<':'&lt;',
+  '>':'&gt;',
+  '"':'&quot;'
+}[c]));
+const range = (a,b) => Array.from({length:Math.max(0,b-a)},(_,i)=>a+i);
+
+let CFG = {o:9,f:18,min:2};
+let jour = today;
+let plage = '';
+
+const P = {
+  matin:[9,13],
+  aprem:[13,18],
+  jour:[9,18]
+};
+
+const ICON = {
+  users:'<svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="7" r="3"/><path d="M2.5 16c.5-3 3-4.5 5.5-4.5s5 1.5 5.5 4.5M13 4.5a2.8 2.8 0 0 1 0 5.2M15 11.8c1.6.6 2.5 2 2.8 4.2"/></svg>',
+  floor:'<svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16h4v-4h4V8h4V4h2"/></svg>'
+};
+
+let tt;
+const toast = (message,error=false) => {
+  const m = $('#toast');
+  m.textContent = message;
+  m.className = 'toast show'+(error?' err':'');
+  clearTimeout(tt);
+  tt = setTimeout(() => m.className='toast',4000);
+};
+
+let token = localStorage.getItem('gabinock_token') || '';
+let currentUser = null;
+
+const api = async (url,options={}) => {
+  options.headers = {
+    ...(options.headers||{}),
+    ...(token ? {Authorization:'Bearer '+token} : {})
+  };
+
+  const response = await fetch(url,options);
+
+  if(response.status===401 && url!='/login') {
+    logout(false);
+    throw new Error('Session expirée. Veuillez vous reconnecter.');
+  }
+
+  if(!response.ok) {
+    const data = await response.json().catch(() => ({}));
+    throw new Error(data.detail || 'Erreur '+response.status);
+  }
+
+  return response.status===204 ? null : response.json();
+};
+
+window.addEventListener('unhandledrejection',event => {
+  toast(event.reason && event.reason.message || 'Erreur inattendue',true);
+});
+
+const setTab = selected => {
+  ['salles','resas'].forEach(key => {
+    $('#t-'+key).setAttribute('aria-selected',key===selected);
+  });
+};
+
+const setBadge = count => {
+  const badge = $('#badge');
+  badge.hidden = !count;
+  badge.textContent = count;
+};
+
+const refreshBadge = async () => {
+  const reservations = await api('/reservations');
+  setBadge(reservations.filter(r => !r.passee).length);
+};
+
+const ticks = '<div class="ticks"><span style="left:0">9h</span><span style="left:44.4%;transform:translateX(-50%)">13h</span><span style="right:0">18h</span></div>';
+
+const bar = (occupied,selected,passed=0) =>
+  `<div class="bar" aria-hidden="true">${range(CFG.o,CFG.f).map(h => {
+    const busy = h<passed || occupied.some(r => r.debut<=h && h<r.fin);
+    return `<i class="${busy?'b':''}${selected && !(h>=selected[0] && h<selected[1])?' out':''}"></i>`;
+  }).join('')}</div>${ticks}`;
+
+const rbar = (start,end) =>
+  `<div class="bar" aria-hidden="true">${range(CFG.o,CFG.f).map(h =>
+    `<i class="${h>=start && h<end?'in':'e'}"></i>`
+  ).join('')}</div>`;
+
+const dayNav = () =>
+  `<div class="daynav">
+    <button class="icon" id="prev" aria-label="Jour précédent" ${jour<=today?'disabled':''}>‹</button>
+    <label class="date">
+      <span>${long(jour)}</span>
+      <small>${rel(jour)}</small>
+      <input type="date" id="dt" value="${jour}" min="${today}" aria-label="Choisir une date">
+    </label>
+    <button class="icon" id="next" aria-label="Jour suivant">›</button>
+  </div>`;
+
+const wireDay = render => {
+  $('#prev').onclick = () => {
+    jour = add(jour,-1);
+    render();
+  };
+
+  $('#next').onclick = () => {
+    jour = add(jour,1);
+    render();
+  };
+
+  const dateInput = $('#dt');
+  dateInput.onchange = event => {
+    if(event.target.value) {
+      jour = event.target.value;
+      render();
+    }
+  };
+
+  dateInput.onclick = () => {
+    try {
+      dateInput.showPicker();
+    } catch {}
+  };
+};
+
+/* ---------- Liste des salles ---------- */
+
+function analyse(room) {
+  const freeHours = new Set(
+    range(CFG.o,CFG.f).filter(hour =>
+      hour>=room.passe_avant &&
+      !room.occupees.some(reservation =>
+        reservation.debut<=hour && hour<reservation.fin
+      )
+    )
+  );
+
+  const hasBlock = [...freeHours].some(hour =>
+    range(0,CFG.min).every(k => freeHours.has(hour+k))
+  );
+
+  if(plage) {
+    const [start,end] = P[plage];
+    const ok = range(start,end).every(hour => freeHours.has(hour));
+    return {
+      ok,
+      txt:ok ? `Libre de ${start}h à ${end}h` : 'Indisponible sur cette plage'
+    };
+  }
+
+  if(freeHours.size===CFG.f-CFG.o) {
+    return {ok:true,txt:'Libre toute la journée'};
+  }
+
+  return hasBlock
+    ? {ok:true,txt:`${freeHours.size} h libres`}
+    : {ok:false,txt:room.passe_avant>=CFG.f?'Journée terminée':'Complète'};
+}
+
+async function vueSalles() {
+  setTab('salles');
+
+  const rooms = await api(`/salles?jour=${jour}`);
+  const rows = rooms.map(room => ({room,...analyse(room)}))
+    .sort((a,b) => Number(b.ok)-Number(a.ok));
+
+  const availableCount = rows.filter(row => row.ok).length;
+
+  const chips = [
+    ['','Toute heure',''],
+    ['matin','Matin','9h–13h'],
+    ['aprem','Après-midi','13h–18h'],
+    ['jour','Journée entière','9h–18h']
+  ];
+
+  app.innerHTML = `
+    <h1>Réserver une salle</h1>
+    <p class="sub">Choisissez un jour et une plage horaire : la disponibilité de chaque salle s’affiche en direct.</p>
+
+    <div class="controls">
+      ${dayNav()}
+      <div class="chips" role="group" aria-label="Plage horaire">
+        ${chips.map(([key,label,subtitle]) =>
+          `<button class="chip" data-p="${key}" aria-pressed="${plage===key}">
+            ${label}${subtitle?`<small>${subtitle}</small>`:''}
+          </button>`
+        ).join('')}
+      </div>
+    </div>
+
+    <p class="count">
+      <b>${availableCount}</b> salle${availableCount>1?'s':''}
+      disponible${availableCount>1?'s':''} sur ${rows.length}
+    </p>
+
+    ${availableCount || !plage ? '' :
+      '<div class="empty"><b>Aucune salle libre sur cette plage</b>Essayez une autre plage horaire ou un autre jour.</div>'}
+
+    <div class="grid">
+      ${rows.map(({room,ok,txt}) => `
+        <article class="room ${ok?'':'dim'}" tabindex="0" role="link"
+          data-id="${room.id}" aria-label="${esc(room.nom)}, ${txt}">
+          <h3>${esc(room.nom)}</h3>
+          <div class="meta">
+            <span>${ICON.users}${room.capacite} personnes</span>
+            <span>${ICON.floor}Étage ${room.etage}</span>
+          </div>
+          <div class="tags">
+            ${room.equipements.split(',').map(e =>
+              `<span class="tag">${esc(e.trim())}</span>`
+            ).join('')}
+          </div>
+          ${bar(room.occupees,plage&&P[plage],room.passe_avant)}
+          <div class="status">
+            <span class="pill ${ok?'ok':'no'}">${txt}</span>
+            <span class="go-link">Réserver ›</span>
+          </div>
+        </article>
+      `).join('')}
+    </div>
+  `;
+
+  wireDay(vueSalles);
+
+  document.querySelectorAll('.chip').forEach(button => {
+    button.onclick = () => {
+      plage = button.dataset.p;
+      vueSalles();
+    };
+  });
+
+  document.querySelectorAll('.room').forEach(card => {
+    const openRoom = () => vueSalle(+card.dataset.id,plage);
+    card.onclick = openRoom;
+    card.onkeydown = event => {
+      if(event.key==='Enter' || event.key===' ') {
+        event.preventDefault();
+        openRoom();
+      }
+    };
+  });
+
+  refreshBadge();
+}
+
+/* ---------- Détail et réservation ---------- */
+
+async function vueSalle(id,pre) {
+  setTab('salles');
+
+  const room = await api(`/salles/${id}?jour=${jour}`);
+  CFG = {o:room.ouverture,f:room.fermeture,min:room.duree_min};
+
+  const occupied = hour =>
+    room.occupees.some(reservation =>
+      reservation.debut<=hour && hour<reservation.fin
+    );
+
+  const busy = hour => occupied(hour) || hour<room.passe_avant;
+  const free = (start,end) => range(start,end).every(hour => !busy(hour));
+
+  let start = null;
+  let end = null;
+
+  if(pre && P[pre] && free(...P[pre])) {
+    [start,end] = P[pre];
+  }
+
+  const pick = hour => {
+    if(busy(hour)) return;
+
+    if(start===null || end!==null || hour<start) {
+      start = hour;
+      end = null;
+      return draw();
+    }
+
+    const selectedEnd = Math.max(hour+1,start+CFG.min);
+
+    if(selectedEnd>CFG.f) {
+      return toast(`La salle ferme à ${CFG.f}h : choisissez un début plus tôt.`,true);
+    }
+
+    if(!free(start,selectedEnd)) {
+      return toast('Cette plage chevauche une réservation existante.',true);
+    }
+
+    end = selectedEnd;
+    draw();
+  };
+
+  function draw() {
+    const reachable = new Set();
+
+    if(start!==null && end===null) {
+      for(let hour=start+1;hour<CFG.f && !busy(hour);hour++) {
+        reachable.add(hour);
+      }
+    }
+
+    const done = start!==null && end!==null;
+    const shortcuts = [
+      ['Matin',9,13],
+      ['Après-midi',13,18],
+      ['Journée entière',9,18]
+    ];
+
+    app.innerHTML = `
+      <button class="back" id="back">‹ Toutes les salles</button>
+
+      <div class="head">
+        <div>
+          <h1>${esc(room.nom)}</h1>
+          <div class="meta">
+            <span>${ICON.users}${room.capacite} personnes</span>
+            <span>${ICON.floor}Étage ${room.etage}</span>
+          </div>
+          <div class="tags">
+            ${room.equipements.split(',').map(e =>
+              `<span class="tag">${esc(e.trim())}</span>`
+            ).join('')}
+          </div>
+        </div>
+        ${dayNav()}
+      </div>
+
+      <section class="panel">
+        <h2>1. Choisissez votre plage horaire</h2>
+
+        <div class="shortcuts" style="margin-bottom:14px">
+          ${shortcuts.map(([label,x,y]) => `
+            <button class="chip" data-x="${x}" data-y="${y}"
+              aria-pressed="${start===x && end===y}" ${free(x,y)?'':'disabled'}>
+              ${label}<small>${x}h–${y}h</small>
+            </button>
+          `).join('')}
+        </div>
+
+        <div class="timeline">
+          ${range(CFG.o,CFG.f).map(hour => {
+            let css = busy(hour) ? 'busy' : 'free';
+            let label = busy(hour) ? (occupied(hour)?'Occupé':'Passé') : 'Libre';
+
+            if(start!==null && end===null) {
+              if(hour===start) {
+                css = 'free sel';
+                label = 'Début';
+              } else if(reachable.has(hour)) {
+                css = 'reach';
+              }
+            } else if(done && hour>=start && hour<end) {
+              css = 'free sel';
+              label = 'Choisi';
+            }
+
+            return `
+              <button class="cell ${css}" data-h="${hour}"
+                ${busy(hour)?'disabled':''}
+                aria-label="${hour}h, ${label}">
+                <b>${hour}h</b><span>${label}</span>
+              </button>
+            `;
+          }).join('')}
+        </div>
+
+        <div class="legend">
+          <span><i style="background:var(--free);border:1px solid var(--free-line)"></i>Libre</span>
+          <span><i style="background:var(--hatch)"></i>Occupé ou passé</span>
+          <span><i style="background:var(--orange)"></i>Votre sélection</span>
+        </div>
+      </section>
+
+      <div class="dock">
+        <div>
+          ${done
+            ? `<div class="big">${start}h – ${end}h</div>
+               <div class="small">${end-start} heures, ${long(jour).toLowerCase()}`
+            : `<div class="big idle">Aucune plage choisie</div>
+               <div class="small">${start===null
+                 ? 'Cliquez sur l’heure de début.'
+                 : `Cliquez sur l’heure de fin (minimum ${CFG.min} h).`}`
+          }
+        </div>
+        <button class="btn" id="ok" ${done?'':'disabled'}>Confirmer la réservation</button>
+      </div>
+    `;
+
+    $('#back').onclick = () => vueSalles();
+    wireDay(() => vueSalle(id));
+
+    document.querySelectorAll('.cell').forEach(button => {
+      button.onclick = () => pick(+button.dataset.h);
+    });
+
+    document.querySelectorAll('.shortcuts .chip').forEach(button => {
+      button.onclick = () => {
+        start = +button.dataset.x;
+        end = +button.dataset.y;
+        draw();
+      };
+    });
+
+    $('#ok').onclick = async event => {
+      event.target.disabled = true;
+
+      try {
+        await api('/reservations',{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({
+            salle_id:id,
+            date:jour,
+            debut:start,
+            fin:end
+          })
+        });
+
+        toast(`${room.nom} réservée : ${long(jour).toLowerCase()}, de ${start}h à ${end}h.`);
+        vueResas();
+      } catch(error) {
+        toast(error.message,true);
+        vueSalle(id);
+      }
+    };
+  }
+
+  draw();
+}
+
+/* ---------- Mes réservations ---------- */
+
+async function vueResas() {
+  setTab('resas');
+
+  const all = await api('/reservations');
+  const upcoming = all.filter(r => !r.passee);
+  const past = all.filter(r => r.passee).reverse();
+
+  setBadge(upcoming.length);
+
+  const item = (reservation,isPast=false) => `
+    <article class="resa ${isPast?'past':''}">
+      <div class="datebox">
+        <b>${parse(reservation.date).getDate()}</b>
+        <span>${fmt(reservation.date,{month:'short'})}</span>
+      </div>
+
+      <div class="resa-main">
+        <h3>
+          ${esc(reservation.salle)}
+          <span class="when">${isPast?'':rel(reservation.date)}</span>
+        </h3>
+        <p>${long(reservation.date)}, de ${reservation.debut}h à ${reservation.fin}h (${reservation.fin-reservation.debut} h)</p>
+        ${rbar(reservation.debut,reservation.fin)}
+      </div>
+
+      ${isPast ? '' : `
+        <div class="actions" data-id="${reservation.id}">
+          <button class="btn warm sm" data-a="ask">Annuler</button>
+        </div>
+      `}
+    </article>
+  `;
+
+  app.innerHTML = `
+    <h1>Mes réservations</h1>
+    <p class="sub">Vos salles réservées à venir. Vous pouvez annuler une réservation à tout moment.</p>
+
+    ${upcoming.length
+      ? upcoming.map(reservation => item(reservation)).join('')
+      : `<div class="empty">
+          <b>Aucune réservation à venir</b>
+          Parcourez les salles pour en réserver une.
+          <br><br>
+          <button class="btn" id="book-room">Réserver une salle</button>
+        </div>`
+    }
+
+    ${past.length
+      ? `<h2>Passées</h2>${past.map(reservation => item(reservation,true)).join('')}`
+      : ''
+    }
+  `;
+
+  const bookButton = $('#book-room');
+  if(bookButton) bookButton.onclick = () => vueSalles();
+
+  document.querySelectorAll('.actions').forEach(box => {
+    const id = box.dataset.id;
+
+    const ask = () => {
+      box.innerHTML = `
+        <button class="btn danger sm" data-a="yes">Confirmer l’annulation</button>
+        <button class="btn ghost sm" data-a="no">Garder</button>
+      `;
+
+      box.querySelector('[data-a="yes"]').onclick = async () => {
+        try {
+          await api('/reservations/'+id,{method:'DELETE'});
+          toast('Réservation annulée.');
+          vueResas();
+        } catch(error) {
+          toast(error.message,true);
+        }
+      };
+
+      box.querySelector('[data-a="no"]').onclick = () => {
+        box.innerHTML = '<button class="btn warm sm" data-a="ask">Annuler</button>';
+        box.querySelector('[data-a="ask"]').onclick = ask;
+      };
+    };
+
+    box.querySelector('[data-a="ask"]').onclick = ask;
+  });
+}
+
+/* ---------- Connexion ---------- */
+
+function vueLogin(message='') {
+  document.body.classList.add('auth-mode');
+  $('#navtabs').hidden = true;
+  $('#userbox').hidden = true;
+
+  app.innerHTML = `
+    <section class="auth">
+      <h1>Connexion</h1>
+      <p class="sub">Connectez-vous pour accéder à la réservation des salles.</p>
+
+      <form id="loginform">
+        <label for="email">Adresse e-mail</label>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          autocomplete="username"
+          required
+          maxlength="254"
+          placeholder="nom@legabinock.net"
+        >
+
+        <label for="password">Mot de passe</label>
+        <input
+          id="password"
+          name="password"
+          type="password"
+          autocomplete="current-password"
+          required
+          minlength="8"
+          maxlength="128"
+          placeholder="Votre mot de passe"
+        >
+
+        <button class="btn" id="loginbtn" type="submit">Se connecter</button>
+        <div class="auth-error" role="alert">${esc(message)}</div>
+      </form>
+    </section>
+  `;
+
+  $('#loginform').onsubmit = async event => {
+    event.preventDefault();
+
+    const button = $('#loginbtn');
+    button.disabled = true;
+
+    try {
+      const data = await api('/login',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          email:$('#email').value.trim(),
+          password:$('#password').value
+        })
+      });
+
+      token = data.access_token;
+      localStorage.setItem('gabinock_token',token);
+      currentUser = data.user;
+
+      showApp();
+      await vueSalles();
+    } catch(error) {
+      vueLogin(error.message);
+    }
+  };
+}
+
+/* ---------- Session et déconnexion ---------- */
+
+function showApp() {
+  document.body.classList.remove('auth-mode');
+  $('#navtabs').hidden = false;
+  $('#userbox').hidden = false;
+  $('#useremail').textContent = currentUser.email;
+
+  $('#logout').onclick = () => {
+    const confirmed = window.confirm('Voulez-vous vraiment vous déconnecter ?');
+
+    if(confirmed) {
+      logout(true);
+    }
+  };
+}
+
+function logout(callApi=true) {
+  const oldToken = token;
+
+  token = '';
+  currentUser = null;
+  localStorage.removeItem('gabinock_token');
+
+  if(callApi && oldToken) {
+    fetch('/logout',{
+      method:'POST',
+      headers:{Authorization:'Bearer '+oldToken}
+    }).catch(() => {});
+  }
+
+  vueLogin();
+}
+
+/* ---------- Vérification de la session au démarrage ---------- */
+
+(async () => {
+  if(token) {
+    try {
+      currentUser = await api('/me');
+      showApp();
+      await vueSalles();
+      return;
+    } catch(error) {
+      // Une session invalide renvoie l'utilisateur à la connexion.
+    }
+  }
+
+  vueLogin();
+})();
+</script>
+</body>
+</html>
